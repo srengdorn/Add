@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+
+<!-- Mirrored from kcs24.com/rean-web-admin/ by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 17 Jan 2023 05:11:45 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+<meta charset="utf-8">
+<title>Rean Web-Admin Page</title>
+<link rel="icon" href="public/img/icon.png">
+<link href="https://fonts.googleapis.com/css?family=Content&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="public/css/fontawesome-free-5.3.1-web/css/all.min.css">
+<link rel="stylesheet" href="public/css/style.css">
+<script src="public/js/jquery-3.2.1.min.js"></script>
+</head>
+<body style="background-color: #fff;">
+<center>
+	<img src="public/img/icon.png" height="40">
+</center>
+<div class="frm" id="frm-login" style="border: 1px solid #ccc;">
+	<div class="header">
+		<span>Login to Rean Web Admin Management System Page</span>
+	</div>
+	<form class="upl">
+		<div class="body">
+			<label>Email</label>
+			<input type="text" class="frm-control" name="txt-email" id="txt-email" autofocus>	
+			<label>Password</label>
+			<input type="password" class="frm-control" name="txt-pass" id="txt-pass">
+		</div>
+		<div class="footer">
+			<div class="btn-post">
+				Login
+			</div>
+			<a href="#" style="color: green;" id="btn-forgot">Forgot password</a>
+		</div>
+	</form>
+</div>	
+<h1 style="text-align: center; padding: 0; margin: 0;display: none;"></h1>
+</body>
+<script>var ADM_PATH="../home/kcs24/public_html/rean-web-admin/index.html"; var ADM_URL="index.html";</script>
+<script>
+	$(document).ready(function(){
+		var body=$('body');
+		var loading2="<div class='loading'><i class='fas fa-circle-notch fa-spin'></i> <span>Reset new password is process..<br> Please wait a minute.</span></div>";
+		var pop="<div class='popup'>"+loading2+"</div>";
+		var email=$('#txt-email');
+		var pass=$('#txt-pass');
+		var loading='<i class="fas fa-circle-notch fa-spin"></i> Wait...';	
+		//forgot password
+		$('#btn-forgot').click(function(){
+			var eThis=$(this);	
+			if(email.val()=='' || !validateEmail(email.val())){
+				alert('Plese input email again.');
+				email.focus();
+				return;
+			}$.ajax({
+				url:ADM_URL+'action/verify.php',
+				type:"POST",
+				data:{frm:0,email:email.val()},
+				cache:false,
+				dataType:"json",
+				beforeSend:function(){
+					body.append(pop);
+				},
+				success:function(data){
+					if(data.status==false){
+						alert('Plese input email again.');
+						body.find('.popup').remove();
+					}else{
+						//window.location.href = "verify-code.php?email="+email.val()+"";
+						body.find('.loading i').remove();
+						body.find('.loading span').html('Process is complete. <br> Please check your email for receive Password.');
+						setTimeout(function(){ 
+							body.find('.popup').remove();
+							window.location.href="https://mail.google.com/mail/u/0/#inbox";
+						}, 
+							5000);
+					}
+				}
+			});
+		});
+		//login
+		$('.btn-post').click(function(){
+			var eThis=$(this);			
+			if(email.val()=='' || !validateEmail(email.val())){
+				alert('Plese input email again.');
+				email.focus();
+				return;
+			}else if(pass.val()=='' || pass.val().length<6){
+				alert('Please input password again.');
+				pass.focus();
+				return;
+			}
+			$.ajax({
+				url:ADM_URL+'action/login.php',
+				type:"POST",
+				data:{frm:0,email:email.val(),pass:pass.val()},
+				cache:false,
+				dataType:"json",
+				beforeSend:function(){
+					eThis.css({'pointer-events': 'none','opacity':'0.7'});
+					eThis.html(loading);
+				},
+				success:function(data){
+					if(data.edit==true){
+						window.location.href = ADM_URL+"frm-main.php";
+					}else{
+						alert('Please input email and password again.');
+						eThis.css({'pointer-events': 'auto','opacity':'1'});
+						eThis.html('Login');	
+					}
+				}
+			});
+		});
+		
+		//save data		
+		$(document).keypress(function(event) {
+			var keycode = (event.keyCode ? event.keyCode : event.which);
+			if (keycode == '13') {
+					$('.btn-post').click();	
+			}
+		});		
+		function validateEmail($email) {
+			var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+  			return emailReg.test( $email );
+		}
+	});
+	
+</script>
+
+<!-- Mirrored from kcs24.com/rean-web-admin/ by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 17 Jan 2023 05:11:48 GMT -->
+</html>
